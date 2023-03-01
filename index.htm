@@ -6,13 +6,19 @@
 
 <script>
 
-async function load() {
-     const url = 'https://oonawith2o.github.io/ITS365/model.json';
+async function loadM1() {
+     const url = 'https://oonawith2o.github.io/ITS365/model_js/model.json';
      const model = await tf.loadLayersModel(url);
      return model;
 };
 
-function predict(model) {
+async function loadXOR() {
+     const url = 'https://oonawith2o.github.io/ITS365/modelXOR_js/modelXOR.json';
+     const model = await tf.loadLayersModel(url);
+     return model;
+};
+
+function predictM1(model) {
     const userInput = document.getElementById('userInput').value;
     const inputTensor = tf.tensor([parseInt(userInput)]);
     
@@ -24,17 +30,37 @@ function predict(model) {
     });
 };
 
-const model = load();
+function predictXOR(model) {
+    const userInputX1 = document.getElementById('userInputX1').value;
+    const userInputX2 = document.getElementById('userInputX2').value;
+    const inputTensor = tf.tensor([[parseInt([userInputX1]), parseInt([userInputX2])]]);
+    
+    model.then(model => {
+        let result = model.predict(inputTensor);
+        result = result.round().dataSync()[0];
+        alert(result ? "1" : "0");
+    });
+};
+
+const modelM1 = loadM1();
+const modelXOR = loadXOR();
 
 </script>
 </head>
 
 <body>
-<h3>  ML Example  </h3>
+<h3>  ML Even&Odd Problem </h3>
 
 <input id="userInput" type="text">  </input>
+<button onclick="predictM1(modelM1)">Predict</button>
 
-<button onclick="predict(model)">Predict</button>
+<p> </p>
+<hr>
+
+<h3> ML XOR Problem </h3>
+<input id="userInputX1" type="text">  </input>
+<input id="userInputX2" type="text">  </input>
+<button onclick="predictXOR(modelXOR)">Predict</button>
 
 </body>
 
