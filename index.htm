@@ -49,7 +49,7 @@ function predictXOR(model) {
 };
 
 function predictCNN(model) {
-    const userInputImg = tf.convert_to_tensor(document.getElementById('userInputImg'));
+    const userInputImg = document.getElementById('userInputImg').data();
     const inputTensor =   tf.browser.fromPixels(userInputImg).resizeNearestNeighbor([32, 32]).toFloat();
     
     model.then(model => {
