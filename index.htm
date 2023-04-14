@@ -18,6 +18,12 @@ async function loadXOR() {
      return model;
 };
 
+async function loadCNN() {
+     const url = 'https://oonawith2o.github.io/ITS365/modelCNN_js/modelCNN.json';
+     const model = await tf.loadLayersModel(url);
+     return model;
+};
+
 function predictM1(model) {
     const userInput = document.getElementById('userInput').value;
     const inputTensor = tf.tensor([parseInt(userInput)]);
@@ -42,8 +48,21 @@ function predictXOR(model) {
     });
 };
 
+function predictCNN(model) {
+    const userInputImg = tf.convert_to_tensor(document.getElementById('userInputImg'));
+    const inputTensor =   tf.browser.fromPixels(userInputImg).resizeNearestNeighbor([32, 32]).toFloat();
+    
+    model.then(model => {
+        let result = model.predict(inputTensor).data();
+        const CLASSES = ["badminton", "basketball", "boxing", "football", "formula1", "gymnastics", "ice_hockey", "swimming", "tennis", "weight_lifting"];
+        result_idx = np.argmax(result, axis = -1);
+        alert(CLASSES[result_idx]);
+    });
+};
+
 const modelM1 = loadM1();
 const modelXOR = loadXOR();
+const modelCNN = loadCNN();
 
 </script>
 </head>
@@ -61,6 +80,17 @@ const modelXOR = loadXOR();
 <input id="userInputX1" type="text">  </input>
 <input id="userInputX2" type="text">  </input>
 <button onclick="predictXOR(modelXOR)">Predict</button>
+
+<p> </p>
+<hr>
+
+<h3> ML CNN Problem </h3>
+<label for="userInputImg"> Choose a picture (.jpg): </label>
+<input id="userInputImg" name="userInputImg" type="file" accept="image/jpeg"> </input>
+<button onclick="predictCNN(modelCNN)">Predict</button>
+
+<p> </p>
+<hr>
 
 </body>
 
