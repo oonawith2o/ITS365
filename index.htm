@@ -49,16 +49,34 @@ function predictXOR(model) {
 };
 
 function predictCNN(model) {
-    const userInputImg = document.getElementById('userInputImg').data();
-    const inputTensor =   tf.browser.fromPixels(userInputImg).resizeNearestNeighbor([32, 32]).toFloat();
-    
-    model.then(model => {
-        let result = model.predict(inputTensor).data();
+    const inputImage = document.getElementById('myimage');
+    console.log(inputImage);
+    var inputTensor =   tf.browser.fromPixels(inputImage).resizeNearestNeighbor([32, 32]).toFloat().expandDims();
+    var normalizedInputTensor = tf.div(inputTensor, 255);
+    console.log(normalizedInputTensor.dataSync());
+
+    model.then(model => {   
+        let result = model.predict([normalizedInputTensor]); 
+        var arrayResult = tf.squeeze(result, axis=0).dataSync();
+        console.log(arrayResult)
         const CLASSES = ["badminton", "basketball", "boxing", "football", "formula1", "gymnastics", "ice_hockey", "swimming", "tennis", "weight_lifting"];
-        result_idx = np.argmax(result, axis = -1);
-        alert(CLASSES[result_idx]);
-    });
+        alert("The uploaded images matches the following class: " + CLASSES[arrayResult.indexOf(Math.max.apply(Math, arrayResult))]);
+    }); 
 };
+
+function onFileSelected(event) {
+  var selectedFile = event.target.files[0];
+  var reader = new FileReader();
+
+  var imgtag = document.getElementById("myimage");
+  imgtag.title = selectedFile.name;
+
+  reader.onload = function(event) {
+    imgtag.src = event.target.result;
+  };
+
+  reader.readAsDataURL(selectedFile);
+}
 
 const modelM1 = loadM1();
 const modelXOR = loadXOR();
@@ -85,8 +103,10 @@ const modelCNN = loadCNN();
 <hr>
 
 <h3> ML CNN Problem </h3>
+<p> Please upload a picture of any of the follwing 10 sports: Badminton, Basketball, Boxing, Football, Formula1, Gymnastics, Ice Hockey, Swimming, Tennis, and Weight Lifting.</p>
+<img id="myimage" height="200"> <br>
 <label for="userInputImg"> Choose a picture (.jpg): </label>
-<input id="userInputImg" name="userInputImg" type="file" accept="image/jpeg"> </input>
+<input type="file" id="userInputImg" name="img" accept="image/jpeg" onchange="onFileSelected(event)">>
 <button onclick="predictCNN(modelCNN)">Predict</button>
 
 <p> </p>
